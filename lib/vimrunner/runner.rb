@@ -12,10 +12,12 @@ module Vimrunner
   class Runner
     attr_reader :servername
 
+    COMMAND = 'mvim'
+
     class << self
       def start_gvim
         servername = "VIMRUNNER#{rand.to_s}"
-        command    = "gvim -f -u #{vimrc_path} --noplugin --servername #{servername}"
+        command    = "#{COMMAND} -f -u #{vimrc_path} --noplugin --servername #{servername}"
         pid        = spawn(command, [:in, :out, :err] => :close)
 
         new(pid, servername)
@@ -23,7 +25,7 @@ module Vimrunner
 
       def start_vim
         servername     = "VIMRUNNER#{rand.to_s}"
-        command        = "vim -f -u #{vimrc_path} --noplugin --servername #{servername}"
+        command        = "#{COMMAND} -f -u #{vimrc_path} --noplugin --servername #{servername}"
         _out, _in, pid = PTY.spawn(command)
 
         new(pid, servername)
@@ -34,7 +36,7 @@ module Vimrunner
       end
 
       def serverlist
-        %x[vim --serverlist].strip.split "\n"
+        %x[#{COMMAND} --serverlist].strip.split "\n"
       end
     end
 
@@ -137,7 +139,7 @@ module Vimrunner
     private
 
     def invoke_vim(*args)
-      args = ['vim', '--servername', @servername, *args]
+      args = [COMMAND, '--servername', @servername, *args]
       Shell.run *args
     end
 
